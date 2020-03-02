@@ -7,14 +7,33 @@
 			v-bind:placeholder="$i18n( 'vuetest-language-search-placeholder' )"
 		>
 		<div class="mw-language-search-results">
-			<language-search-result
+			<!-- <language-search-result
 				v-for="result in results"
 				v-show="result.match"
 				v-bind:key="result.code"
 				v-bind:result="result.result"
 				v-bind:match-prop="result.matchProp"
 				v-bind:query="search"
-			/>
+			/> -->
+			<div
+				v-for="result in results"
+				v-show="result.match"
+				v-bind:key="result.code"
+				class="mw-language-search-result"
+			>
+				<span class="mw-language-search-result-name">
+					<strong v-if="result.highlightedName">
+						{{ result.highlightedName }}
+					</strong>
+					{{ result.restOfName }}
+				</span>
+				<span class="mw-language-search-result-otherMatch">
+					<strong v-if="result.highlightedOtherMatch">
+						{{ result.highlightedOtherMatch }}
+					</strong>
+					{{ result.restOfOtherMatch }}
+				</span>
+			</div>
 		</div>
 	</div>
 </template>
@@ -44,10 +63,18 @@ module.exports = {
 						result[ prop ] !== undefined &&
 						result[ prop ].toLowerCase().substring( 0, query.length ) === query
 					) {
-						return { result: result, match: true, matchProp: prop };
+						return {
+							result: result,
+							match: true,
+							matchProp: prop,
+							highlightedName: prop === 'name' ? result.name.substring( 0, query.length ) : '',
+							restOfName: prop === 'name' ? result.name.substring( query.length ) : result.name,
+							highlightedOtherMatch: prop !== 'name' ? result[ prop ].substring( 0, query.length ) : '',
+							restOfOtherMatch: prop !== 'name' ? result[ prop ].substring( query.length ) : result.code
+						};
 					}
 				}
-				return { result: result, match: false };
+				return { result: result, match: false, highlightedName: '', restOfName: result.name, highlightedOtherMatch: '', restOfOtherMatch: result.code };
 			} );
 		}
 	},
