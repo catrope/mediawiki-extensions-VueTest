@@ -6,7 +6,7 @@
 	<div id="child-component" class="child-component">
 		<span>{{ message }}</span>
 		<button v-on:click="$emit( 'update-count' )">
-			{{ $i18n( 'vuetest-child-component-button' ) }}
+			{{ i18n( 'vuetest-child-component-button' ) }}
 		</button>
 	</div>
 </template>
@@ -27,6 +27,10 @@ module.exports = {
 			type: String,
 			required: true
 		}
+	},
+
+	setup: function () {
+		return { i18n: require( 'vue3' ).inject( 'i18n' ) };
 	}
 
 };

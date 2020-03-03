@@ -13,20 +13,17 @@
  */
 var apiPlugin = {
 	/**
-	 * @param {Object} Vue constructor
+	 * @param {Object} app Vue app
 	 * @param {Object} options
 	 */
-	install: function ( Vue, options ) {
+	install: function ( app, options ) {
 		options = options || {};
 
 		// Create a mediawiki API object with appropriate options and stash it
 		// as a global property
-		Vue.api = new mw.Api( options );
+		app.mwApi = new mw.Api( options );
 
-		// Add a global instance property for use within individual components.
-		// Every component now has the ability to call `this.$api.get`,
-		// `this.$api.post`, etc.
-		Vue.prototype.$api = Vue.api;
+		app.provide( 'api', app.mwApi );
 	}
 };
 

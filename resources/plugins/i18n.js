@@ -13,19 +13,17 @@
  */
 var i18nPlugin = {
 	/**
-	 * @param {Object} Vue constructor
+	 * @param {Object} app Vue app
 	 */
-	install: function ( Vue ) {
+	install: function ( app ) {
 
 		/**
 		 * This adds a custom "v-i18n-html" directive for use in templates.
 		 * More infomation about custom directives is available here:
 		 * https://vuejs.org/v2/guide/custom-directive.html
 		 */
-		Vue.directive( 'i18n-html', {
-			isLiteral: true,
-
-			bind( el, binding ) {
+		app.directive( 'i18n-html', {
+			mounted: function ( el, binding ) {
 				var messageKey;
 
 				// Check first to see if user has provide an arg via
@@ -46,7 +44,7 @@ var i18nPlugin = {
 		 * provided as message params
 		 * @return {Object} mw.message object
 		 */
-		Vue.prototype.$i18n = function ( msgKey ) {
+		app.provide( 'i18n', function ( msgKey ) {
 			// Determine if any additional params are present
 			if ( arguments.length > 1 ) {
 				return mw.message.apply( mw, arguments );
@@ -54,7 +52,7 @@ var i18nPlugin = {
 				return mw.message( msgKey );
 			}
 
-		};
+		} );
 	}
 };
 

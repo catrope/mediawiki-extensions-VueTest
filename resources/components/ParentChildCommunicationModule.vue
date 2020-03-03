@@ -4,11 +4,11 @@
 <template>
 	<div id="parent-child-communication-module">
 		<h2>
-			{{ $i18n( 'vuetest-parent-child-communication-title' ) }}
+			{{ i18n( 'vuetest-parent-child-communication-title' ) }}
 		</h2>
 
 		<p>
-			{{ $i18n( 'vuetest-parent-child-communication-intro' ) }}
+			{{ i18n( 'vuetest-parent-child-communication-intro' ) }}
 		</p>
 
 		<pre>Click count: {{ clickCount }}</pre>
@@ -40,6 +40,10 @@ module.exports = {
 		updateCount: function () {
 			this.clickCount++;
 		}
+	},
+
+	setup: function () {
+		return { i18n: require( 'vue3' ).inject( 'i18n' ) };
 	}
 };
 </script>

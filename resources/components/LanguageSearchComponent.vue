@@ -4,7 +4,7 @@
 			v-model="search"
 			type="search"
 			class="mw-language-search-input"
-			v-bind:placeholder="$i18n( 'vuetest-language-search-placeholder' )"
+			v-bind:placeholder="i18n( 'vuetest-language-search-placeholder' )"
 		>
 		<div class="mw-language-search-results">
 			<language-search-result
@@ -53,6 +53,9 @@ module.exports = {
 	},
 	components: {
 		'language-search-result': require( './LanguageSearchResult.vue' )
+	},
+	setup: function () {
+		return { i18n: require( 'vue3' ).inject( 'i18n' ) };
 	}
 };
 </script>

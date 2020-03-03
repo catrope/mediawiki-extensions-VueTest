@@ -6,11 +6,11 @@
 <template>
 	<div id="api-request-module">
 		<h2>
-			{{ $i18n( 'vuetest-apirequest-title' ) }}
+			{{ i18n( 'vuetest-apirequest-title' ) }}
 		</h2>
 
 		<p>
-			{{ $i18n( 'vuetest-apirequest-intro') }}
+			{{ i18n( 'vuetest-apirequest-intro') }}
 		</p>
 
 		<!--
@@ -20,13 +20,13 @@
 		-->
 		<div>
 			<pre v-if="wikitext">{{ wikitext }}</pre>
-			<pre v-else>{{ $i18n( 'vuetest-apirequest-pending' ) }}</pre>
+			<pre v-else>{{ i18n( 'vuetest-apirequest-pending' ) }}</pre>
 		</div>
 
 		<input v-model="pageTitle" type="text">
 
 		<button v-on:click="requestWikitext()">
-			{{ $i18n( 'vuetest-apirequest-button' ) }}
+			{{ i18n( 'vuetest-apirequest-button' ) }}
 		</button>
 	</div>
 </template>
@@ -52,7 +52,7 @@ module.exports = {
 		 * @param {string} pageTitle
 		 */
 		requestWikitext: function () {
-			this.$api.get( {
+			this.api.get( {
 				action: 'query',
 				format: 'json',
 				prop: 'revisions',
@@ -63,6 +63,14 @@ module.exports = {
 				this.wikitext = response.query.pages[ '1' ].revisions[ 0 ].slots.main[ '*' ];
 			}.bind( this ) );
 		}
+	},
+
+	setup: function () {
+		var Vue = require( 'vue3' );
+		return {
+			i18n: Vue.inject( 'i18n' ),
+			api: Vue.inject( 'api' )
+		};
 	}
 };
 </script>

@@ -1,11 +1,11 @@
 <template>
 	<div id="language-search-module">
 		<h2>
-			{{ $i18n( 'vuetest-language-search-title' ) }}
+			{{ i18n( 'vuetest-language-search-title' ) }}
 		</h2>
 
 		<p>
-			{{ $i18n( 'vuetest-language-search-intro', numLangs ) }}
+			{{ i18n( 'vuetest-language-search-intro', numLangs ) }}
 		</p>
 
 		<language-search />
@@ -25,6 +25,9 @@ module.exports = {
 		return {
 			numLangs: Object.keys( languageNames ).length
 		};
+	},
+	setup: function () {
+		return { i18n: require( 'vue3' ).inject( 'i18n' ) };
 	}
 };
 </script>

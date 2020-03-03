@@ -6,7 +6,7 @@
 <template>
 	<div id="two-way-binding-module">
 		<h2>
-			{{ $i18n( 'vuetest-two-way-binding-title' ) }}
+			{{ i18n( 'vuetest-two-way-binding-title' ) }}
 		</h2>
 
 		<p v-i18n-html:vuetest-two-way-binding-intro />
@@ -25,6 +25,10 @@ module.exports = {
 		return {
 			input: 'test test'
 		};
+	},
+
+	setup: function () {
+		return { i18n: require( 'vue3' ).inject( 'i18n' ) };
 	}
 
 };

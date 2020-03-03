@@ -17,7 +17,7 @@
 			returns a mw.message object. This can be output directly into a
 			template inside curly brackets.
 		-->
-		<h1>{{ $i18n( 'vuetest-app-welcome') }}</h1>
+		<h1>{{ i18n( 'vuetest-app-welcome') }}</h1>
 
 		<!--
 			The same plugin also defines a custom directive, v-i18n-html.
@@ -65,7 +65,8 @@ var ApiRequestModule = require( './ApiRequestModule.vue' ),
 	ComputedPropertyModule = require( './ComputedPropertyModule.vue' ),
 	TwoWayBindingModule = require( './TwoWayBindingModule.vue' ),
 	ParentChildCommunicationModule = require( './ParentChildCommunicationModule.vue' ),
-	LanguageSearchModule = require( './LanguageSearchModule.vue' );
+	LanguageSearchModule = require( './LanguageSearchModule.vue' ),
+	Vue = require( 'vue3' );
 
 module.exports = {
 	name: 'App',
@@ -75,6 +76,9 @@ module.exports = {
 		'two-way-binding-module': TwoWayBindingModule,
 		'parent-child-communication-module': ParentChildCommunicationModule,
 		'language-search-module': LanguageSearchModule
+	},
+	setup: function () {
+		return { i18n: Vue.inject( 'i18n' ) };
 	}
 };
 </script>

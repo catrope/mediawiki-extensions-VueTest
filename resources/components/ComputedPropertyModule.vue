@@ -5,11 +5,11 @@
 <template>
 	<div id="computed-property-module">
 		<h2>
-			{{ $i18n( 'vuetest-computed-property-title' ) }}
+			{{ i18n( 'vuetest-computed-property-title' ) }}
 		</h2>
 
 		<p>
-			{{ $i18n( 'vuetest-computed-property-intro' ) }}
+			{{ i18n( 'vuetest-computed-property-intro' ) }}
 		</p>
 
 		<pre>{{ sum }}</pre>
@@ -34,6 +34,10 @@ module.exports = {
 		sum: function () {
 			return Number( this.a ) + Number( this.b );
 		}
+	},
+
+	setup: function () {
+		return { i18n: require( 'vue3' ).inject( 'i18n' ) };
 	}
 
 };

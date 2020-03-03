@@ -21,26 +21,15 @@
  * https://vuejs.org/v2/guide/render-function.html
  */
 ( function () {
-	var Vue = require( 'vue' ),
+	var Vue = require( 'vue3' ),
 		App = require( 'ext.vueTest.components' ).App,
 		i18n = require( 'ext.vueTest.plugins' ).i18n,
 		api = require( 'ext.vueTest.plugins' ).api;
 
-	/**
-	 * Vue plugins need to be initialized with Vue.use() before the Vue
-	 * instance is created. These plugins live in the resources/plugins
-	 * directory. More information about Vue plugins can be found here:
-	 * https://vuejs.org/v2/guide/plugins.html
-	 */
-	Vue.use( i18n );
-	Vue.use( api );
-
 	// Create the Vue instance
-	// eslint-disable-next-line no-new
-	new Vue( {
-		el: '#vue-root',
-		render: function ( h ) {
-			return h( App );
-		}
-	} );
+	Vue
+		.createApp( App )
+		.use( i18n )
+		.use( api )
+		.mount( '#vue-root' );
 }() );

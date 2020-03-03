@@ -33,11 +33,16 @@
 		"remoteExtPath": "VueTest/resources"
 	},
 	"ResourceModules": {
+		"vue3": {
+			"packageFiles": [
+				"vue3/vue3.js"
+			]
+		},
 		"ext.vueTest": {
 			"dependencies": [
 				"ext.vueTest.components",
 				"ext.vueTest.plugins",
-				"vue",
+				"vue3",
 				"mediawiki.api"
 			],
 			"messages": [],
