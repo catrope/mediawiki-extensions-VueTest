@@ -33,10 +33,19 @@
 		"remoteExtPath": "VueTest/resources"
 	},
 	"ResourceModules": {
+		"vue-composition-api": {
+			"packageFiles": [
+				"lib/vue-composition-api.js"
+			],
+			"dependencies": [
+				"vue"
+			]
+		},
 		"ext.vueTest": {
 			"dependencies": [
 				"ext.vueTest.components",
 				"ext.vueTest.plugins",
+				"vue-composition-api",
 				"vue",
 				"mediawiki.api"
 			],
@@ -50,12 +59,16 @@
 			"packageFiles": [
 				"plugins/index.js",
 				"plugins/i18n.js",
-				"plugins/api.js"
+				"plugins/api.js",
+				"plugins/apiRequest.js",
+				"plugins/position.js",
+				"plugins/position-directive.js"
 			]
 		},
 		"ext.vueTest.components": {
 			"dependencies": [
-				"mediawiki.language.names"
+				"mediawiki.language.names",
+				"ext.vueTest.plugins"
 			],
 			"messages": [
 				"vuetest-app-welcome",
@@ -87,7 +100,8 @@
 				"components/ChildComponent.vue",
 				"components/LanguageSearchModule.vue",
 				"components/LanguageSearchComponent.vue",
-				"components/SiteSearch.vue"
+				"components/SiteSearch.vue",
+				"components/PositionedElement.vue"
 			]
 		}
 	},

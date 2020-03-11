@@ -22,9 +22,11 @@
  */
 ( function () {
 	var Vue = require( 'vue' ),
+		composition = require( 'vue-composition-api' ),
 		App = require( 'ext.vueTest.components' ).App,
 		i18n = require( 'ext.vueTest.plugins' ).i18n,
-		api = require( 'ext.vueTest.plugins' ).api;
+		api = require( 'ext.vueTest.plugins' ).api,
+		positionDirective = require( 'ext.vueTest.plugins' ).positionDirective;
 
 	/**
 	 * Vue plugins need to be initialized with Vue.use() before the Vue
@@ -32,8 +34,10 @@
 	 * directory. More information about Vue plugins can be found here:
 	 * https://vuejs.org/v2/guide/plugins.html
 	 */
+	Vue.use( composition.default );
 	Vue.use( i18n );
 	Vue.use( api );
+	Vue.use( positionDirective );
 
 	// Create the Vue instance
 	// eslint-disable-next-line no-new

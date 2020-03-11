@@ -1,8 +1,11 @@
 <template>
-	<div class="mw-site-search">
+	<div
+		class="mw-site-search"
+		v-bind:class="{ 'mw-site-search-pending': apiRequestPending }"
+	>
 		<input
-			ref="input"
 			v-model="search"
+			v-position-anchor
 			type="search"
 			class="mw-site-search-input"
 			autocomplete="off"
@@ -21,7 +24,7 @@
 		</button>
 		<div
 			v-show="results.length > 0"
-			ref="results"
+			v-position
 			class="mw-site-search-results"
 		>
 			<div
@@ -47,6 +50,20 @@
 	</div>
 </template>
 <script>
+function debounce( func, wait ) {
+	var timeout = null;
+	return function () {
+		var args = arguments;
+		if ( timeout !== null ) {
+			clearTimeout( timeout );
+		}
+		timeout = setTimeout( function () {
+			timeout = null;
+			func.apply( null, args );
+		}, wait );
+	};
+}
+
 module.exports = {
 	props: {
 		placeholder: String,
@@ -54,57 +71,69 @@ module.exports = {
 		buttonLabel: String,
 		buttonTitle: String
 	},
+	components: {
+		'positioned-element': require( './PositionedElement.vue' )
+	},
+	mixins: [
+		require( 'ext.vueTest.plugins' ).apiRequest
+	],
 	data: function () {
 		return {
 			search: '',
-			selectedIndex: -1,
-			rawResults: {
-				pages: [],
-				query: ''
-			}
+			selectedIndex: -1
 		};
-	},
-	watch: {
-		search: function ( newValue ) {
-			if ( newValue === '' ) {
-				this.rawResults = { pages: [], query: '' };
-			}
-			this.debouncedGetResults();
-		}
-	},
-	created: function () {
-		var timeout = null, func = this.getResults, context = this;
-		this.debouncedGetResults = function () {
-			if ( timeout !== null ) {
-				clearTimeout( timeout );
-			}
-			timeout = setTimeout( function () {
-				timeout = null;
-				func.apply( context, arguments );
-			}, 250 );
-		};
-	},
-	mounted: function () {
-		var input = this.$refs.input,
-			resultsDiv = this.$refs.results;
-		resultsDiv.style.top = input.offsetHeight + 'px';
 	},
 	computed: {
 		results: function () {
-			var query = this.rawResults.query;
-			return this.rawResults.pages.map( function ( page ) {
-				var possiblePrefix = page.slice( 0, query.length ),
-					matches = possiblePrefix.toLowerCase() === query.toLowerCase();
-				return {
-					page: page,
-					url: mw.util.getUrl( page ),
-					highlightedPrefix: matches ? possiblePrefix : '',
-					suffix: matches ? page.slice( possiblePrefix.length ) : page
-				};
-			} );
+			return this.apiRequestResult || [];
 		}
 	},
+	watch: {
+		search: function ( newValue ) {
+			this.apiRequest( newValue );
+		}
+	},
+	/*setup: function () {
+		var usePosition = require( 'ext.vueTest.plugins' ).position,
+			positionProps = usePosition( 'input' );
+
+		return {
+			positionStyle: positionProps.positionStyle
+		};
+	},*/
+	created: function () {
+		this.debouncedApiRequest = debounce( this.apiRequest.bind( this ), 250 );
+	},
 	methods: {
+		makeApiRequest: function ( query ) {
+			var xhr;
+			if ( query === '' ) {
+				return $.Deferred()
+					.resolve( [] )
+					.promise( { abort: () => {} } );
+			}
+			xhr = this.$api.get( {
+				formatversion: 2,
+				action: 'opensearch',
+				search: query,
+				namespace: 0,
+				limit: 10
+			} );
+			return xhr
+				.then( function ( response ) {
+					return response[ 1 ].map( function ( page ) {
+						var possiblePrefix = page.slice( 0, query.length ),
+							matches = possiblePrefix.toLowerCase() === query.toLowerCase();
+						return {
+							page: page,
+							url: mw.util.getUrl( page ),
+							highlightedPrefix: matches ? possiblePrefix : '',
+							suffix: matches ? page.slice( possiblePrefix.length ) : page
+						};
+					} );
+				} )
+				.promise( { abort: xhr.abort } );
+		},
 		setSelection: function ( newSelection ) {
 			this.selectedIndex = newSelection;
 		},
@@ -122,42 +151,8 @@ module.exports = {
 		clearSelection: function () {
 			this.selectedIndex = -1;
 		},
-		getResults: function () {
-			if ( this.fetchingPromise && this.fetchingPromise.abort ) {
-				this.fetchingPromise.abort();
-			}
-			this.fetchingPromise = this.fetchResults();
-			this.fetchingPromise.done( function ( results ) {
-				this.rawResults = results;
-				this.clearSelection();
-			}.bind( this ) );
-		},
-		fetchResults: function () {
-			var query = this.search,
-				apiPromise;
-			if ( query === '' ) {
-				return $.Deferred()
-					.resolve( { pages: [], query: '' } )
-					.promise( { abort: function () {} } );
-			}
-			apiPromise = this.$api.get( {
-				formatversion: 2,
-				action: 'opensearch',
-				search: query,
-				namespace: 0,
-				limit: 10
-			} );
-			return apiPromise
-				.then( function ( response ) {
-					return {
-						pages: response[ 1 ],
-						query: query
-					};
-				} )
-				.promise( { abort: apiPromise.abort } );
-		},
 		clearResults: function () {
-			this.rawResults = { pages: [], query: '' };
+			this.apiRequest( '' );
 			this.clearSelection();
 		}
 	}
@@ -169,6 +164,17 @@ module.exports = {
 
 @width-search-button: 24px;
 @font-size: 13px;
+
+@keyframes pending {
+	0%,
+	100% {
+		background-color: fade( @colorGray12, 80% );
+	}
+
+	50% {
+		background-color: fade( @colorGray12, 50% );
+	}
+}
 
 .mw-site-search {
 	position: relative;
@@ -191,12 +197,16 @@ module.exports = {
 		} );
 	}
 
+	&-pending &-input {
+		animation: pending 500ms infinite;
+	}
+
 	&:hover &-input {
 		border-color: @colorGray7;
 	}
 
-	&:hover &-input:focus,
-	&-input:focus {
+	&-input:focus,
+	&:hover &-input:focus {
 		border-color: @colorProgressive;
 		outline: 0;
 		.box-shadow( @boxShadowProgressiveFocus );
@@ -225,7 +235,7 @@ module.exports = {
 	&-results {
 		position: absolute;
 		margin-top: -1px;
-		background-color: white;
+		background-color: #fff;
 		border: 1px solid @colorGray10;
 		width: 20vw;
 		box-sizing: border-box;
@@ -240,7 +250,7 @@ module.exports = {
 			&:active,
 			&:focus {
 				text-decoration: none;
-				color: black;
+				color: #000;
 			}
 		}
 
@@ -252,7 +262,7 @@ module.exports = {
 				&:hover,
 				&:active,
 				&:focus {
-					color: white;
+					color: #fff;
 				}
 			}
 		}
